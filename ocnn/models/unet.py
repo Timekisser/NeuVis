@@ -52,6 +52,10 @@ class UNet(torch.nn.Module):
     # header
     # channel = self.decoder_channel[self.decoder_stages]
     self.octree_interp = ocnn.nn.OctreeInterp(interp, nempty)
+    self.mlp_vis = torch.nn.Sequential(
+      ocnn.modules.Conv1x1Relu(self.decoder_channel[-1] + self.view_dir_channel, self.head_channel),
+      ocnn.modules.Conv1x1(self.head_channel, self.out_channels, use_bias=True)
+    )
     self.header = torch.nn.Sequential(
         ocnn.modules.Conv1x1BnRelu(self.decoder_channel[-1], self.head_channel),
         ocnn.modules.Conv1x1(self.head_channel, self.out_channels, use_bias=True))
@@ -65,6 +69,7 @@ class UNet(torch.nn.Module):
     self.encoder_blocks = [2, 3, 4, 6]
     self.decoder_blocks = [2, 2, 2, 2]
     self.head_channel = 64
+    self.view_dir_channel = 51
     self.bottleneck = 1
     self.resblk = ocnn.modules.OctreeResBlock2
 
@@ -93,7 +98,7 @@ class UNet(torch.nn.Module):
     return deconv
 
   def forward(self, data: torch.Tensor, octree: Octree, depth: int,
-              query_pts: torch.Tensor):
+              query_pts: torch.Tensor, view_dir: torch.Tensor):
     r''''''
 
     convd = self.unet_encoder(data, octree, depth)
@@ -101,5 +106,8 @@ class UNet(torch.nn.Module):
 
     interp_depth = depth - self.encoder_stages + self.decoder_stages
     feature = self.octree_interp(deconv, octree, interp_depth, query_pts)
-    logits = self.header(feature)
-    return logits
+    feature = torch.cat([feature, view_dir], dim=-1)
+    visibility = self.mlp_vis(feature)
+    return visibility
+    # logits = self.header(feature)
+    # return logits

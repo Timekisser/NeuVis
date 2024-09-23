@@ -4,6 +4,9 @@ import math
 import json
 import os
 
+
+import utils
+
 # This code creates dataset "ShapeNet_NeuVis"
 # The specific structures of the datasets are as follows 
 
@@ -40,8 +43,8 @@ model.json
 }
 '''
 
-base_dir = 'D:\\\\Dataset'
-mesh_data_dir = 'ShapeNet_Mesh'
+base_dir = '/mnt/sdb/wangjh/wangjh/ShapeNet'
+mesh_data_dir = 'ShapeNetCore.v2'
 cloud_data_dir = 'ShapeNet_Pointcloud'
 output_data_dir = 'ShapeNet_NeuVis'
 
@@ -149,6 +152,8 @@ for c in catagories:
 iteration = 0
 
 for idx, c in enumerate(catagories):
+    if not os.path.exists(os.path.join(base_dir, output_data_dir, c)):
+        os.makedirs(os.path.join(base_dir, output_data_dir, c))
     for m in models[idx]:
         iteration += 1
         
@@ -271,13 +276,20 @@ for idx, c in enumerate(catagories):
         result = recorder_device.copy_to_host()
         indices = np.where(result == 0)[0]
         
-        if not os.path.exists(os.path.join(base_dir, output_data_dir, c, m)):
-            os.makedirs(os.path.join(base_dir, output_data_dir, c, m))
-        text = {}
-        text['view_point'] = view_point.tolist()
-        text['visible_index'] = indices.tolist()
-        with open(os.path.join(base_dir, output_data_dir, c, m, 'model.json'), 'w') as f:
-            json.dump(text, f)
-        np.savetxt(os.path.join(base_dir, output_data_dir, c, m, 'model.pts'), V)
-        np.savetxt(os.path.join(base_dir, output_data_dir, c, m, 'model_visible.pts'), V[indices])
-        print(V.shape[0], V[indices].shape[0])
+        # if not os.path.exists(os.path.join(base_dir, output_data_dir, c, m)):
+        #     os.makedirs(os.path.join(base_dir, output_data_dir, c, m))
+        # text = {}
+        # text['view_point'] = view_point.tolist()
+        # text['visible_index'] = indices.tolist()
+        # with open(os.path.join(base_dir, output_data_dir, c, m, 'model.json'), 'w') as f:
+        #     json.dump(text, f)
+        filename_ply = os.path.join(base_dir, output_data_dir, c, m + '.ply')
+
+        utils.save_points_to_ply(
+            filename_ply, V, V-view_point, labels=result, text=False)
+        
+        print('Save: ' + os.path.basename(filename_ply))
+
+        # np.savetxt(os.path.join(base_dir, output_data_dir, c, m, 'model.pts'), V)
+        # np.savetxt(os.path.join(base_dir, output_data_dir, c, m, 'model_visible.pts'), V[indices])
+        # print(V.shape[0], V[indices].shape[0])

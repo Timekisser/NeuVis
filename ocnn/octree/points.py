@@ -10,6 +10,58 @@ import numpy as np
 from typing import Optional, Union, List
 
 
+# Positional encoding (section 5.1)
+class Embedder:
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        self.create_embedding_fn()
+        
+    def create_embedding_fn(self):
+        embed_fns = []
+        d = self.kwargs['input_dims']
+        out_dim = 0
+        if self.kwargs['include_input']:
+            embed_fns.append(lambda x : x)
+            out_dim += d
+            
+        max_freq = self.kwargs['max_freq_log2']
+        N_freqs = self.kwargs['num_freqs']
+        
+        if self.kwargs['log_sampling']:
+            freq_bands = 2.**torch.linspace(0., max_freq, steps=N_freqs)
+        else:
+            freq_bands = torch.linspace(2.**0., 2.**max_freq, steps=N_freqs)
+            
+        for freq in freq_bands:
+            for p_fn in self.kwargs['periodic_fns']:
+                embed_fns.append(lambda x, p_fn=p_fn, freq=freq : p_fn(x * freq))
+                out_dim += d
+                    
+        self.embed_fns = embed_fns
+        self.out_dim = out_dim
+        
+    def embed(self, inputs):
+        return torch.cat([fn(inputs) for fn in self.embed_fns], -1)
+
+
+def get_embedder(multires, i=0):
+    if i == -1:
+        return torch.nn.Identity(), 3
+    
+    embed_kwargs = {
+                'include_input' : True,
+                'input_dims' : 3,
+                'max_freq_log2' : multires-1,
+                'num_freqs' : multires,
+                'log_sampling' : True,
+                'periodic_fns' : [torch.sin, torch.cos],
+    }
+    
+    embedder_obj = Embedder(**embed_kwargs)
+    embed = lambda x, eo=embedder_obj : eo.embed(x)
+    return embed, embedder_obj.out_dim
+
+
 class Points:
   r''' Represents a point cloud and contains some elementary transformations.
 
@@ -32,7 +84,9 @@ class Points:
                features: Optional[torch.Tensor] = None,
                labels: Optional[torch.Tensor] = None,
                batch_id: Optional[torch.Tensor] = None,
-               batch_size: int = 1):
+               batch_size: int = 1,
+               viewdirs: Optional[torch.Tensor] = None,
+               em_freq=8):
     super().__init__()
     self.points = points
     self.normals = normals
@@ -42,6 +96,10 @@ class Points:
     self.batch_size = batch_size
     self.device = points.device
     self.batch_npt = None   # valid after `merge_points`
+    self.viewdirs = viewdirs
+    # self.embed_fn = get_embedder(em_freq)
+    # if self.normals is not None:
+    #   self.viewdirs = self.embed_fn(self.normals)
     self.check_input()
 
   def check_input(self):
@@ -180,6 +238,8 @@ class Points:
       out.labels = self.labels[mask]
     if self.batch_id is not None:
       out.batch_id = self.batch_id[mask]
+    if self.viewdirs is not None:
+      out.viewdirs = self.viewdirs[mask]
     return out
 
   def inbox_mask(self, bbmin: Union[float, torch.Tensor] = -1.0,
@@ -245,6 +305,8 @@ class Points:
       points.labels = self.labels.to(device, non_blocking=non_blocking)
     if self.batch_id is not None:
       points.batch_id = self.batch_id.to(device, non_blocking=non_blocking)
+    if self.viewdirs is not None:
+      points.viewdirs = self.viewdirs.to(device, non_blocking=non_blocking)
     return points
 
   def cuda(self, non_blocking: bool = False):
@@ -307,6 +369,8 @@ def merge_points(points: List['Points'], update_batch_info: bool = True):
     out.features = torch.cat([p.features for p in points], dim=0)
   if points[0].labels is not None:
     out.labels = torch.cat([p.labels for p in points], dim=0)
+  if points[0].viewdirs is not None:
+    out.viewdirs = torch.cat([p.viewdirs for p in points], dim=0)
   out.device = points[0].device
 
   if update_batch_info:

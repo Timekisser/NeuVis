@@ -116,6 +116,23 @@ class Conv1x1(torch.nn.Module):
     return self.linear(data)
 
 
+class Conv1x1Relu(torch.nn.Module):
+  r''' A sequence of :class:`Conv1x1` and :class:`Relu`.
+  '''
+
+  def __init__(self, in_channels: int, out_channels: int):
+    super().__init__()
+    self.conv = Conv1x1(in_channels, out_channels, use_bias=False)
+    self.relu = torch.nn.ReLU(inplace=True)
+
+  def forward(self, data: torch.Tensor):
+    r''''''
+
+    out = self.conv(data)
+    out = self.relu(out)
+    return out
+
+
 class Conv1x1Bn(torch.nn.Module):
   r''' A sequence of :class:`Conv1x1` and :class:`BatchNorm`.
   '''

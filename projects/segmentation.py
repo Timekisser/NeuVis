@@ -71,8 +71,7 @@ class SegSolver(Solver):
     octree, points = batch['octree'], batch['points']
     data = self.get_input_feature(octree)
     query_pts = torch.cat([points.points, points.batch_id], dim=1)
-
-    logit = self.model(data, octree, octree.depth, query_pts)
+    logit = self.model(data, octree, octree.depth, query_pts, points.viewdirs) # add points.normal
     labels = points.labels.squeeze(1)
     label_mask = labels > self.FLAGS.LOSS.mask  # filter labels
     return logit[label_mask], labels[label_mask]

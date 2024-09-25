@@ -28,7 +28,7 @@ ratios = args.ratios
 
 module = 'segmentation.py'
 script = 'python %s --config configs/seg_shapenet.yaml' % module
-data = '../NeuVis/projects/data/ShapeNet_NeuVis'
+data = 'data/ShapeNet_NeuVis'
 logdir = 'logs/seg_shapenet_NeuVis'
 
 # categories = ['02691156', '02773838', '02954340', '02958343',

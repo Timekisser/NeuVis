@@ -25,7 +25,7 @@ torch.multiprocessing.set_sharing_strategy('file_system')
 class SegSolver(Solver):
   def __init__(self, flags, is_master=True):
     super().__init__(flags, is_master)
-    self.embedder,_ = get_embedder(8)
+    self.embedder,_ = get_embedder(flags.MODEL.multires)
 
   def get_model(self, flags):
     if flags.name.lower() == 'segnet':

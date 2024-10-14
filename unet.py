@@ -53,7 +53,8 @@ class UNet(torch.nn.Module):
     # channel = self.decoder_channel[self.decoder_stages]
     self.octree_interp = ocnn.nn.OctreeInterp(interp, nempty)
     self.mlp_vis = torch.nn.Sequential(
-      ocnn.modules.Conv1x1BnRelu(self.decoder_channel[-1] + self.view_dir_channel, self.head_channel),
+      ocnn.modules.Conv1x1BnRelu(self.decoder_channel[-1] + self.view_dir_channel, self.head_channel*2),
+      ocnn.modules.Conv1x1BnRelu(self.head_channel*2, self.head_channel),
       ocnn.modules.Conv1x1(self.head_channel, self.out_channels, use_bias=True)
     )
     self.header = torch.nn.Sequential(
@@ -69,7 +70,7 @@ class UNet(torch.nn.Module):
     self.encoder_blocks = [2, 3, 4, 6]
     self.decoder_blocks = [2, 2, 2, 2]
     self.head_channel = 64
-    self.view_dir_channel = 51
+    self.view_dir_channel = 16
     self.bottleneck = 1
     self.resblk = ocnn.modules.OctreeResBlock2
 

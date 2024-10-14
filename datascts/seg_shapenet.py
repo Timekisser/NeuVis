@@ -18,6 +18,7 @@ class ShapeNetTransform(Transform):
   def preprocess(self, sample: dict, idx: int):
     xyz = torch.from_numpy(sample['points']).float()
     normal = torch.from_numpy(sample['normals']).float()
+    normal = normal / torch.norm(normal, dim=1, keepdim=True)
     # here we use position encoding on normals(actually viewdir)
     labels = torch.from_numpy(sample['labels']).float()
     points = Points(xyz, normal, labels=labels.unsqueeze(1))

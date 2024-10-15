@@ -15,9 +15,10 @@ from numba import cuda
 |target_directory
 |---[category_code]
 |---|---[model_code]
-|---|---|---vertices.npy [(n, 3)-np.float32] (n <= max_npoint)
-|---|---|---visibilities.npy [(n, n_vp)-bool] (n <= max_npoint)
-|---|---|---viewpoints.npy [(n_vp, 3)-np.float32]
+|---|---|---data.npz
+|---|---|---|---vertices: [(n, 3)-np.float32] (n <= max_npoint)
+|---|---|---|---visibilities [(n, n_vp)-bool] (n <= max_npoint)
+|---|---|---|---viewpoints [(n_vp, 3)-np.float32]
 '''
 
 # max_npoint : target point number of downsampling
@@ -150,7 +151,5 @@ for idx, c in enumerate(catagories):
         new_V_visibility = gt_visibility(new_V, new_v, F, f, Vp)
         if not os.path.exists(os.path.join(target_directory, c, m)):
             os.makedirs(os.path.join(target_directory, c, m))
-        np.save(os.path.join(target_directory, c, m, 'vertices.npy'), new_V)
-        np.save(os.path.join(target_directory, c, m, 'visibilities.npy'), new_V_visibility)
-        np.save(os.path.join(target_directory, c, m, 'viewpoints.npy'), Vp)
+        np.savez(os.path.join(target_directory, c, m, 'data.npz'), vertices=new_V, visibilities=new_V_visibility, viewpoints=Vp)
         pbar.update(1)

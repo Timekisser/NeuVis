@@ -16,7 +16,7 @@ def create_train_val_test_lists(directory, train_val_ratio=0.8):
     ply_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith('.ply'):
+            if file.endswith('.npz'):
                 ply_files.append(os.path.join(root, file))
 
     # Shuffle the list
@@ -52,13 +52,13 @@ def write_lists_to_files(file_lists, base_directory):
 
 
 # 假设.ply文件位于以下目录
-ply_directory_path = './data/ShapeNet_NeuVis/points/03691459'
+ply_directory_path = './data/ShapeNet_NV/points/02691156'
 
 # 创建训练/验证和测试文件列表
 file_lists = create_train_val_test_lists(ply_directory_path)
 
 # 假设您希望filelist子目录位于以下基础目录
-base_directory_path = './data/ShapeNet_NeuVis/'
+base_directory_path = './data/ShapeNet_NV/'
 
 # 将文件列表写入到filelist子目录中的.txt文件
 write_lists_to_files(file_lists, base_directory_path)

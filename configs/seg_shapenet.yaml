@@ -39,8 +39,8 @@ DATA:
     uniform: True
 
     # data loading
-    location: data/ShapeNet_NeuVis/points
-    filelist: data/ShapeNet_NeuVis/filelist/02691156_train_val.txt
+    location: data/ShapeNet_NV/points
+    filelist: data/ShapeNet_NV/filelist/02691156_train_val.txt
     batch_size: 32
     shuffle: True
     # num_workers: 0
@@ -64,8 +64,8 @@ DATA:
     uniform: True
 
     # data loading
-    location: data/ShapeNet_NeuVis/points
-    filelist: data/ShapeNet_NeuVis/filelist/02691156_test.txt
+    location: data/ShapeNet_NV/points
+    filelist: data/ShapeNet_NV/filelist/02691156_test.txt
     batch_size: 1
     shuffle: False
     # num_workers: 0

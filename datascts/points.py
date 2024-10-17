@@ -107,15 +107,15 @@ class Points_with_viewdirs:
     '''
 
     assert self.points.dim() == 2 and self.points.size(1) == 3
-    if self.normals is not None:
-      assert self.normals.dim() == 2 and self.normals.size(1) == 3
-      assert self.normals.size(0) == self.points.size(0)
+    # if self.normals is not None:
+    #   assert self.normals.dim() == 2 and self.normals.size(1) == 3
+    #   assert self.normals.size(0) == self.points.size(0)
     if self.features is not None:
       assert self.features.dim() == 2
       assert self.features.size(0) == self.points.size(0)
-    if self.labels is not None:
-      assert self.labels.dim() == 2
-      assert self.labels.size(0) == self.points.size(0)
+    # if self.labels is not None:
+    #   assert self.labels.dim() == 2
+    #   assert self.labels.size(0) == self.points.size(0)
     if self.batch_id is not None:
       assert self.batch_id.dim() == 2 and self.batch_id.size(1) == 1
       assert self.batch_id.size(0) == self.points.size(0)

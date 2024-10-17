@@ -28,33 +28,33 @@ ratios = args.ratios
 
 module = 'segmentation.py'
 script = 'python %s --config configs/seg_shapenet.yaml' % module
-data = 'data/ShapeNet_NeuVis'
-logdir = 'logs/seg_shapenet_NeuVis'
+data = 'data/ShapeNet_NV'
+logdir = 'logs/seg_shapenet_NV'
 
 # categories = ['02691156', '02773838', '02954340', '02958343',
 #               '03001627', '03261776', '03467517', '03624134',
 #               '03636649', '03642806', '03790512', '03797390',
 #               '03948459', '04099429', '04225987', '04379243']
-categories = ['03691459']
+categories = ['02691156']
 # names = ['Aero', 'Bag', 'Cap', 'Car',
 #          'Chair', 'EarPhone', 'Guitar', 'Knife',
 #          'Lamp', 'Laptop', 'Motor', 'Mug',
 #          'Pistol', 'Rocket', 'Skate', 'Table']
-names = ['Bag']
+names = ['Aero']
 # seg_num = [4, 2, 2, 4, 4, 3, 3, 2, 4, 2, 6, 2, 3, 3, 3, 3]
 seg_num = [2]
 # train_num = [2348, 62, 44, 717, 3052, 55, 626, 312,
 #              1261, 367, 151, 146, 234, 54, 121, 4421]
-train_num = [1264]
+train_num = [3236]
 # test_num = [341, 14, 11, 153, 693, 14, 159, 80,
 #             285, 78, 51, 38, 41, 12, 31, 842]
-test_num = [317]
+test_num = [809]
 # max_epoches = [300, 1800, 2400, 600, 300, 2000, 600, 600,
 #                300, 600, 1200, 1200, 600, 1800, 1200, 200]
 max_epoches = [3000]
 # max_iters = [20000, 3000, 3000, 10000, 20000, 3000, 10000, 5000,
 #              10000, 5000, 5000, 5000, 5000, 3000, 5000, 20000]
-max_iters = [10000]
+max_iters = [20000]
 
 
 for i in range(len(ratios)):

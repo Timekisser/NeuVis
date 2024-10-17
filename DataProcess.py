@@ -26,8 +26,8 @@ from numba import cuda
 
 # n_vp: number of viewpoints for each pointcloud
 
-directory = 'D:\\\\Dataset\\ShapeNet_Mesh_repaired'
-target_directory = 'D:\\\\Dataset\\ShapeNet_NV'
+directory = '/mnt/sdc/weist/data/ShapeNet/mesh_256'
+target_directory = 'data/ShapeNet_NV'
 max_npoint = 8192
 n_vp = 128
 

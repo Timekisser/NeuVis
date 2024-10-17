@@ -48,9 +48,9 @@ def get_embedder(multires, i=0):
                 'periodic_fns' : [torch.sin, torch.cos],
     }
     
-    # embedder_obj = Embedder(**embed_kwargs)
-    embedder_obj = SHEncoder(input_dim=3, degree=4)
-    embed = lambda x, eo=embedder_obj : eo(x)
+    embedder_obj = Embedder(**embed_kwargs)
+    # embedder_obj = SHEncoder(input_dim=3, degree=4)
+    embed = lambda x, eo=embedder_obj : eo.embed(x)
     return embed, embedder_obj.out_dim
 
 

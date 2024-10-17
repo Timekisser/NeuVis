@@ -7,10 +7,33 @@
 
 import torch
 import torch.nn
-from typing import Dict
+from typing import Dict, List
 
 import ocnn
 from ocnn.octree import Octree
+
+
+class OctreeConvRelu(torch.nn.Module):
+  r''' A sequence of :class:`OctreeConv` and :obj:`Relu`.
+
+  Please refer to :class:`ocnn.nn.OctreeConv` for details on the parameters.
+  '''
+
+  def __init__(self, in_channels: int, out_channels: int,
+               kernel_size: List[int] = [3], stride: int = 1,
+               nempty: bool = False):
+    super().__init__()
+    self.conv = ocnn.nn.OctreeConv(
+        in_channels, out_channels, kernel_size, stride, nempty)
+    self.relu = torch.nn.ReLU(inplace=True)
+
+  def forward(self, data: torch.Tensor, octree: Octree, depth: int):
+    r''''''
+
+    out = self.conv(data, octree, depth)
+    out = self.relu(out)
+    return out
+  
 
 
 class UNet(torch.nn.Module):
@@ -70,7 +93,7 @@ class UNet(torch.nn.Module):
     self.encoder_blocks = [2, 3, 4, 6]
     self.decoder_blocks = [2, 2, 2, 2]
     self.head_channel = 64
-    self.view_dir_channel = 16
+    self.view_dir_channel = 63
     self.bottleneck = 1
     self.resblk = ocnn.modules.OctreeResBlock2
 
@@ -107,8 +130,9 @@ class UNet(torch.nn.Module):
 
     interp_depth = depth - self.encoder_stages + self.decoder_stages
     feature = self.octree_interp(deconv, octree, interp_depth, query_pts)
+    feature = feature.unsqueeze(1).repeat(1,16,1)
     feature = torch.cat([feature, view_dir], dim=-1)
-    visibility = self.mlp_vis(feature)
+    visibility = self.mlp_vis(feature.reshape(-1, 96+63))
     return visibility
     # logits = self.header(feature)
     # return logits

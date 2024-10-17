@@ -49,13 +49,15 @@ class ReadNpz:
     raw = np.load(filename)
 
     output = dict()
-    output['points'] = raw['points'].astype(np.float32)
+    output['points'] = raw['vertices'].astype(np.float32)
     if self.has_normal:
-      output['normals'] = raw['normals'].astype(np.float32)
+      vp = raw['viewpoints'][:16,:].astype(np.float32)
+      output['normals'] = output['points'][:, np.newaxis, :] - vp[np.newaxis, :, :]
+      # output['normals'] = raw['normals'].astype(np.float32)
     if self.has_color:
       output['colors'] = raw['colors'].astype(np.float32)
     if self.has_label:
-      output['labels'] = raw['labels'].astype(np.int32)
+      output['labels'] = raw['visibilities'][:, :16].astype(np.int32)
     return output
 
 

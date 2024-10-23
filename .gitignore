@@ -13,3 +13,5 @@ submit
 thsolver
 .amltconfig
 .amltignore
+checkpoints_3
+*.txt

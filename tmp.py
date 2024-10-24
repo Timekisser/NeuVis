@@ -51,8 +51,10 @@ def process_data(data, sample=32, with_noise=False):
         index = np.random.permutation(128)
         vertices = torch.from_numpy(each_data_npz['vertices']).float().view(-1, 3)
         if with_noise:
-            noise = 0.01*(torch.rand_like(vertices) * 2 - 1)
-            vertices = vertices + noise
+            noise = torch.randn_like(vertices)
+            noise = noise / torch.norm(noise, dim=1, keepdim=True)
+            # noise = 0.01*(torch.rand_like(vertices) * 2 - 1)
+            vertices = vertices + 0.01*noise
         view_points = torch.from_numpy(each_data_npz['viewpoints'][index, :]).float().view(-1, 3)
         view_dirs = (vertices.unsqueeze(1) - view_points.unsqueeze(0))
         view_dirs = view_dirs / torch.norm(view_dirs, dim=2).unsqueeze(2)
@@ -90,7 +92,7 @@ def model_forward(feature_model, vis_model, oct_embedder, embedder, VD, O, P, sa
 
     return output
 
-base_dir = 'data/ShapeNet_NV/points/02691156'
+base_dir = 'data/ShapeNet_NV_simplified'
 
 data = []
 
@@ -108,9 +110,9 @@ for root, dirs, files in os.walk(base_dir):
 
 n_data = len(data)
 
-batch_size = 4
+batch_size = 8
 
-n_test = int(((n_data * 0.1) // batch_size) + (n_data % batch_size))
+n_test = int(((n_data * 0.2) // batch_size) + (n_data % batch_size))
 n_train = int(n_data - n_test)
 indices = np.random.permutation(n_data)
 data = [data[i] for i in indices]
@@ -134,7 +136,7 @@ save_every_epoch = 5
 
 sample = 32
 
-sub_batch_size = 4
+sub_batch_size = 8
 
 for i in range(n_epoch):
     feature_model.train()

@@ -28,8 +28,8 @@ import math
 
 # n_vp: number of viewpoints for each pointcloud
 
-directory = 'D:\\\\Dataset\\ShapeNet_Mesh_simplified'
-target_directory = 'D:\\\\Dataset\\ShapeNet_NV_simplified'
+directory = '/mnt/sdb/wangjh/ShapeNet_Mesh_simplified'
+target_directory = './data/ShapeNet_NV_simplified'
 max_npoint = 8192
 n_vp = 128
 
